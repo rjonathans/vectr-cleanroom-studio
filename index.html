@@ -5,115 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VectrClean Studio - Editor Vetorial</title>
   <script>
-    const cdn_tw = 'https://' + 'cdn.' + 'tail' + 'wind' + 'css' + '.com';
     const cdn_fa = 'https://' + 'cdn' + 'js.cloud' + 'flare' + '.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    const cdn_pj = 'https://' + 'cdn' + 'js.cloud' + 'flare' + '.com/ajax/libs/paper.js/0.12.17/paper-full.min.js';
-    const cdn_jz = 'https://' + 'cdn' + 'js.cloud' + 'flare' + '.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    const cdn_pdf = 'https://' + 'cdn' + 'js.cloud' + 'flare' + '.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    
-    [cdn_tw, cdn_pj, cdn_jz, cdn_pdf].forEach(src => {
-      const s = document.createElement('script'); s.src = src; document.head.appendChild(s);
-    });
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = cdn_fa; document.head.appendChild(l);
   </script>
   <style>
-    body { user-select: none; margin: 0; padding: 0; background-color: #111827; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; user-select: none; }
+    header { background: #1e293b; border-bottom: 1px solid #334155; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .logo-title { font-weight: 700; font-size: 16px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #2563eb, #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: white; }
+    .top-actions { display: flex; align-items: center; gap: 4px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid #334155; font-size: 12px; }
+    .action-btn { padding: 4px 8px; background: transparent; border: none; color: #cbd5e1; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px; }
+    .action-btn:hover { background: #334155; color: white; }
+    .divider { height: 16px; width: 1px; background: #334155; margin: 0 4px; }
+    .btn-primary { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .btn-secondary:hover { background: #475569; }
+    .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+    aside.tools-left { width: 48px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; flex-shrink: 0; }
+    .tool-btn { width: 36px; height: 36px; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .tool-btn:hover { background: #334155; color: #f8fafc; }
+    .tool-btn.active { background: #2563eb; color: white; }
+    aside.sidebar-left { width: 240px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; flex-shrink: 0; font-size: 12px; }
+    .tab-row { display: flex; border-bottom: 1px solid #334155; background: #0f172a; }
+    .tab-btn { flex: 1; padding: 8px; text-align: center; border: none; background: transparent; color: #94a3b8; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .tab-btn.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; background: #1e293b; }
+    .tab-pane { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .tab-pane.hidden { display: none; }
+    main.canvas-main { flex: 1; display: flex; flex-direction: column; background: #020617; position: relative; overflow: hidden; }
+    .ruler-top { height: 20px; background: #1e293b; border-bottom: 1px solid #334155; flex-shrink: 0; }
+    .canvas-inner { flex: 1; display: flex; position: relative; overflow: hidden; }
+    .ruler-left { width: 20px; background: #1e293b; border-right: 1px solid #334155; flex-shrink: 0; }
+    .svg-wrap { flex: 1; position: relative; overflow: hidden; background-color: #030712; background-image: radial-gradient(#374151 1px, transparent 1px); background-size: 20px 20px; }
+    aside.inspector-right { width: 280px; background: #1e293b; border-left: 1px solid #334155; padding: 12px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex-shrink: 0; font-size: 12px; }
+    .inspector-title { font-weight: 700; font-size: 13px; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .inspector-sec { border-bottom: 1px solid #334155; padding-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .sec-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field-col { display: flex; flex-direction: column; gap: 2px; }
+    .field-col label { color: #94a3b8; font-size: 11px; }
+    input[type="number"], input[type="text"], select { background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 12px; width: 100%; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal-overlay.hidden { display: none; }
+    .modal-box { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; width: 360px; display: flex; flex-direction: column; gap: 12px; font-size: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; font-weight: 700; font-size: 14px; color: white; }
     .rule-tick { stroke: #4b5563; stroke-width: 1; }
     .rule-text { fill: #9ca3af; font-size: 9px; font-family: sans-serif; }
-    .canvas-bg { background-color: #030712; background-image: radial-gradient(#374151 1px, transparent 1px); background-size: 20px 20px; }
+    .sample-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sample-btn { padding: 10px; background: #334155; border: 1px solid #475569; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; text-align: center; }
+    .sample-btn:hover { background: #475569; }
   </style>
 </head>
-<body class="h-screen w-screen flex flex-col overflow-hidden bg-gray-900 text-gray-100 font-sans">
+<body>
 
   <!-- TOP TOOLBAR -->
-  <header class="bg-gray-800 border-b border-gray-700 text-white flex flex-col shrink-0">
-    <div class="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-bold text-lg shadow">V</div>
-        <span class="font-bold text-lg tracking-wide text-gray-100">VectrClean <span class="text-blue-400 text-xs px-2 py-0.5 rounded bg-blue-900/50 border border-blue-700">Studio</span></span>
-      </div>
+  <header>
+    <div class="logo-title">
+      <div class="logo-icon">V</div>
+      <span>VectrClean Studio</span>
+    </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-1 bg-gray-900/80 p-1 rounded-lg border border-gray-700 text-xs">
-        <button id="btn-undo" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Desfazer (Ctrl+Z)"><i class="fa-solid font-bold fa-rotate-left"></i></button>
-        <button id="btn-redo" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Refazer (Ctrl+Y)"><i class="fa-solid font-bold fa-rotate-right"></i></button>
-        <div class="h-4 w-px bg-gray-700 mx-1"></div>
-        <button id="btn-union" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Unir"><i class="fa-solid fa-shapes"></i> Unir</button>
-        <button id="btn-subtract" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Subtrair"><i class="fa-solid fa-minus-square"></i> Subtrair</button>
-        <button id="btn-intersect" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Intersecao"><i class="fa-solid fa-circle-half-stroke"></i> Intersec</button>
-        <button id="btn-exclude" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300" title="Excluir"><i class="fa-solid fa-border-none"></i> Excluir</button>
-        <div class="h-4 w-px bg-gray-700 mx-1"></div>
-        <button id="align-left" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-align-left"></i></button>
-        <button id="align-center" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-align-center"></i></button>
-        <button id="align-right" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-align-right"></i></button>
-        <button id="align-top" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-arrows-up-to-line"></i></button>
-        <button id="align-middle" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-grip-lines-vertical"></i></button>
-        <button id="align-bottom" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-arrows-down-to-line"></i></button>
-        <div class="h-4 w-px bg-gray-700 mx-1"></div>
-        <button id="dist-h" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-arrows-left-right"></i></button>
-        <button id="dist-v" class="px-1.5 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-arrows-up-down"></i></button>
-        <div class="h-4 w-px bg-gray-700 mx-1"></div>
-        <button id="btn-group" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-object-group"></i></button>
-        <button id="btn-ungroup" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-object-ungroup"></i></button>
-        <button id="flip-h" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-right-left"></i></button>
-        <button id="flip-v" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-up-down"></i></button>
-        <button id="btn-dup" class="px-2 py-1 hover:bg-gray-700 rounded text-gray-300"><i class="fa-solid fa-clone"></i></button>
-        <button id="btn-del" class="px-2 py-1 hover:bg-red-900/50 text-red-400 rounded"><i class="fa-solid fa-trash"></i></button>
-      </div>
+    <!-- Actions -->
+    <div class="top-actions">
+      <button id="btn-undo" class="action-btn" title="Desfazer"><i class="fa-solid fa-rotate-left"></i></button>
+      <button id="btn-redo" class="action-btn" title="Refazer"><i class="fa-solid fa-rotate-right"></i></button>
+      <div class="divider"></div>
+      <button id="btn-union" class="action-btn"><i class="fa-solid fa-shapes"></i> Unir</button>
+      <button id="btn-subtract" class="action-btn"><i class="fa-solid fa-minus-square"></i> Subtrair</button>
+      <button id="btn-intersect" class="action-btn"><i class="fa-solid fa-circle-half-stroke"></i> Intersec</button>
+      <button id="btn-exclude" class="action-btn"><i class="fa-solid fa-border-none"></i> Excluir</button>
+      <div class="divider"></div>
+      <button id="align-left" class="action-btn"><i class="fa-solid fa-align-left"></i></button>
+      <button id="align-center" class="action-btn"><i class="fa-solid fa-align-center"></i></button>
+      <button id="align-right" class="action-btn"><i class="fa-solid fa-align-right"></i></button>
+      <button id="align-top" class="action-btn"><i class="fa-solid fa-arrows-up-to-line"></i></button>
+      <button id="align-middle" class="action-btn"><i class="fa-solid fa-grip-lines-vertical"></i></button>
+      <button id="align-bottom" class="action-btn"><i class="fa-solid fa-arrows-down-to-line"></i></button>
+      <div class="divider"></div>
+      <button id="btn-dup" class="action-btn"><i class="fa-solid fa-clone"></i></button>
+      <button id="btn-del" class="action-btn" style="color:#f87171;"><i class="fa-solid fa-trash"></i></button>
+    </div>
 
-      <div class="flex items-center gap-2">
-        <button id="btn-import-modal" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs font-semibold flex items-center gap-1.5 text-gray-200 border border-gray-600"><i class="fa-solid fa-file-import"></i> Importar</button>
-        <button id="btn-export-modal" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-semibold flex items-center gap-1.5 text-white shadow"><i class="fa-solid fa-file-export"></i> Exportar</button>
-      </div>
+    <div style="display:flex; gap:8px;">
+      <button id="btn-import-modal" class="btn-secondary"><i class="fa-solid fa-file-import"></i> Importar</button>
+      <button id="btn-export-modal" class="btn-primary"><i class="fa-solid fa-file-export"></i> Exportar</button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <div class="flex flex-1 overflow-hidden">
+  <!-- MAIN WORKSPACE -->
+  <div class="main-wrapper">
     
     <!-- LEFT TOOL PALETTE -->
-    <aside class="w-12 bg-gray-800 border-r border-gray-700 flex flex-col items-center py-2 gap-1 shrink-0 text-gray-400">
-      <button data-tool="select" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white bg-blue-600 text-white" title="Selecao (V)"><i class="fa-solid fa-mouse-pointer"></i></button>
-      <button data-tool="node" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Edicao de Nos (A)"><i class="fa-solid fa-bezier-curve"></i></button>
-      <div class="w-6 h-px bg-gray-700 my-1"></div>
-      <button data-tool="pen" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Caneta Bezier (P)"><i class="fa-solid fa-pen-nib"></i></button>
-      <button data-tool="pencil" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Lapis Livre (N)"><i class="fa-solid fa-pencil"></i></button>
-      <div class="w-6 h-px bg-gray-700 my-1"></div>
-      <button data-tool="rect" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Retangulo (R)"><i class="fa-regular fa-square"></i></button>
-      <button data-tool="ellipse" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Elipse (O)"><i class="fa-regular fa-circle"></i></button>
-      <button data-tool="polygon" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Poligono (Y)"><i class="fa-solid fa-draw-polygon"></i></button>
-      <button data-tool="star" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Estrela (S)"><i class="fa-regular fa-star"></i></button>
-      <button data-tool="line" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Linha (L)"><i class="fa-solid fa-minus"></i></button>
-      <button data-tool="text" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Texto (T)"><i class="fa-solid fa-font"></i></button>
-      <div class="w-6 h-px bg-gray-700 my-1"></div>
-      <button data-tool="hand" class="tool-btn w-9 h-9 rounded flex items-center justify-center hover:bg-gray-700 hover:text-white" title="Mover Artboard / Pan (H)"><i class="fa-solid fa-hand"></i></button>
+    <aside class="tools-left">
+      <button data-tool="select" class="tool-btn active" title="Selecao (V)"><i class="fa-solid fa-mouse-pointer"></i></button>
+      <button data-tool="node" class="tool-btn" title="Edicao de Nos (A)"><i class="fa-solid fa-bezier-curve"></i></button>
+      <div class="divider" style="width:24px; height:1px; margin:4px 0;"></div>
+      <button data-tool="pen" class="tool-btn" title="Caneta Bezier (P)"><i class="fa-solid fa-pen-nib"></i></button>
+      <button data-tool="pencil" class="tool-btn" title="Lapis Livre (N)"><i class="fa-solid fa-pencil"></i></button>
+      <div class="divider" style="width:24px; height:1px; margin:4px 0;"></div>
+      <button data-tool="rect" class="tool-btn" title="Retangulo (R)"><i class="fa-regular fa-square"></i></button>
+      <button data-tool="ellipse" class="tool-btn" title="Elipse (O)"><i class="fa-regular fa-circle"></i></button>
+      <button data-tool="polygon" class="tool-btn" title="Poligono (Y)"><i class="fa-solid fa-draw-polygon"></i></button>
+      <button data-tool="star" class="tool-btn" title="Estrela (S)"><i class="fa-regular fa-star"></i></button>
+      <button data-tool="line" class="tool-btn" title="Linha (L)"><i class="fa-solid fa-minus"></i></button>
+      <button data-tool="text" class="tool-btn" title="Texto (T)"><i class="fa-solid fa-font"></i></button>
+      <div class="divider" style="width:24px; height:1px; margin:4px 0;"></div>
+      <button data-tool="hand" class="tool-btn" title="Mover Artboard / Pan (H)"><i class="fa-solid fa-hand"></i></button>
     </aside>
 
-    <!-- LEFT SIDEBAR TABS PANEL -->
-    <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col shrink-0 text-xs">
-      <div class="flex border-b border-gray-700 bg-gray-850">
-        <button id="tab-btn-layers" class="tab-btn flex-1 py-2 font-semibold text-center border-b-2 border-blue-500 text-blue-400 bg-gray-800">Camadas</button>
-        <button id="tab-btn-library" class="tab-btn flex-1 py-2 font-semibold text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200">Biblioteca</button>
-        <button id="tab-btn-page" class="tab-btn flex-1 py-2 font-semibold text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200">Pagina</button>
+    <!-- LEFT SIDEBAR TABS -->
+    <aside class="sidebar-left">
+      <div class="tab-row">
+        <button id="tab-btn-layers" class="tab-btn active">Camadas</button>
+        <button id="tab-btn-library" class="tab-btn">Biblioteca</button>
+        <button id="tab-btn-page" class="tab-btn">Pagina</button>
       </div>
 
-      <div id="tab-layers" class="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
-        <div id="layers-list" class="flex flex-col gap-1"></div>
+      <div id="tab-layers" class="tab-pane">
+        <div id="layers-list" style="display:flex; flex-direction:column; gap:6px;"></div>
       </div>
 
-      <div id="tab-library" class="flex-1 overflow-y-auto p-3 hidden grid grid-cols-2 gap-2">
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="star"><i class="fa-solid fa-star text-2xl text-yellow-400"></i><span>Estrela</span></button>
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="heart"><i class="fa-solid fa-heart text-2xl text-red-500"></i><span>Coracao</span></button>
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="gear"><i class="fa-solid fa-gear text-2xl text-blue-400"></i><span>Engrenagem</span></button>
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="house"><i class="fa-solid fa-house text-2xl text-green-400"></i><span>Casa</span></button>
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="arrow"><i class="fa-solid fa-arrow-right text-2xl text-purple-400"></i><span>Seta</span></button>
-        <button class="lib-icon-btn p-3 bg-gray-700/50 hover:bg-gray-700 rounded border border-gray-600 flex flex-col items-center gap-2 text-gray-200" data-icon="shield"><i class="fa-solid fa-shield text-2xl text-indigo-400"></i><span>Escudo</span></button>
+      <div id="tab-library" class="tab-pane hidden" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button class="lib-icon-btn sample-btn" data-icon="star"><i class="fa-solid fa-star text-yellow-400"></i><br>Estrela</button>
+        <button class="lib-icon-btn sample-btn" data-icon="heart"><i class="fa-solid fa-heart text-red-500"></i><br>Coracao</button>
+        <button class="lib-icon-btn sample-btn" data-icon="gear"><i class="fa-solid fa-gear text-blue-400"></i><br>Engrenagem</button>
+        <button class="lib-icon-btn sample-btn" data-icon="house"><i class="fa-solid fa-house text-green-400"></i><br>Casa</button>
       </div>
 
-      <div id="tab-page" class="flex-1 overflow-y-auto p-3 hidden flex flex-col gap-3">
-        <div>
-          <label class="block text-gray-400 mb-1 font-medium">Unidade de Medida</label>
-          <select id="select-unit" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-gray-200">
+      <div id="tab-page" class="tab-pane hidden">
+        <div class="field-col">
+          <label>Unidade de Medida</label>
+          <select id="select-unit">
             <option value="px">Pixels (px)</option>
             <option value="mm">Milimetros (mm)</option>
             <option value="cm">Centimetros (cm)</option>
@@ -123,20 +146,16 @@
       </div>
     </aside>
 
-    <!-- CENTER CANVAS AREA -->
-    <main class="flex-1 flex flex-col relative overflow-hidden bg-gray-950">
-      <div class="h-5 bg-gray-800 border-b border-gray-700 flex shrink-0 relative overflow-hidden">
-        <svg id="ruler-h" class="w-full h-full pointer-events-none"></svg>
-      </div>
-      <div class="flex-1 flex relative overflow-hidden">
-        <div class="w-5 bg-gray-800 border-r border-gray-700 shrink-0 relative overflow-hidden">
-          <svg id="ruler-v" class="w-full h-full pointer-events-none"></svg>
-        </div>
-        <div class="flex-1 relative overflow-hidden canvas-bg" id="canvas-container">
-          <svg id="main-svg" class="w-full h-full cursor-crosshair block select-none">
+    <!-- CANVAS AREA -->
+    <main class="canvas-main">
+      <div class="ruler-top"><svg id="ruler-h" style="width:100%; height:100%;"></svg></div>
+      <div class="canvas-inner">
+        <div class="ruler-left"><svg id="ruler-v" style="width:100%; height:100%;"></svg></div>
+        <div class="svg-wrap">
+          <svg id="main-svg" style="width:100%; height:100%; display:block; cursor:crosshair;">
             <defs>
               <pattern id="artboard-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" stroke-width="0.5"/>
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="0.5"/>
               </pattern>
             </defs>
             <g id="viewport-group" transform="translate(100, 50) scale(1)">
@@ -152,71 +171,71 @@
       </div>
     </main>
 
-    <!-- RIGHT INSPECTOR PANEL -->
-    <aside class="w-72 bg-gray-800 border-l border-gray-700 flex flex-col shrink-0 text-xs p-3 overflow-y-auto gap-4">
-      <h3 class="font-bold text-sm text-gray-200 border-b border-gray-700 pb-2 flex items-center justify-between">
+    <!-- RIGHT INSPECTOR -->
+    <aside class="inspector-right">
+      <div class="inspector-title">
         <span>Inspetor de Propriedades</span>
-        <span id="unit-badge" class="px-1.5 py-0.5 rounded bg-gray-700 text-blue-400 font-mono text-xs">px</span>
-      </h3>
-
-      <div class="flex flex-col gap-2">
-        <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">Transformacao</span>
-        <div class="grid grid-cols-2 gap-2">
-          <div><label class="text-gray-400">X</label><input type="number" id="inp-x" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-          <div><label class="text-gray-400">Y</label><input type="number" id="inp-y" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-          <div><label class="text-gray-400">Largura (W)</label><input type="number" id="inp-w" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-          <div><label class="text-gray-400">Altura (H)</label><input type="number" id="inp-h" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-          <div><label class="text-gray-400">Rotacao (°)</label><input type="number" id="inp-rot" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-          <div><label class="text-gray-400">Raio de Canto</label><input type="number" id="inp-radius" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono"></div>
-        </div>
-        <button id="btn-convert-curves" class="mt-1 w-full py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-gray-200 font-semibold border border-gray-600"><i class="fa-solid fa-bezier-curve"></i> Converter em Curvas</button>
+        <span id="unit-badge" style="background:#0f172a; padding:2px 6px; border-radius:4px; color:#38bdf8;">px</span>
       </div>
 
-      <div class="flex flex-col gap-2 border-t border-gray-700 pt-3">
-        <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">Preenchimento</span>
-        <div class="flex items-center gap-2">
-          <input type="color" id="fill-color" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
-          <input type="text" id="fill-hex" class="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono uppercase" value="#3B82F6">
+      <div class="inspector-sec">
+        <span class="sec-label">Transformacao</span>
+        <div class="grid-2">
+          <div class="field-col"><label>X</label><input type="number" id="inp-x"></div>
+          <div class="field-col"><label>Y</label><input type="number" id="inp-y"></div>
+          <div class="field-col"><label>Largura (W)</label><input type="number" id="inp-w"></div>
+          <div class="field-col"><label>Altura (H)</label><input type="number" id="inp-h"></div>
+          <div class="field-col"><label>Rotacao (°)</label><input type="number" id="inp-rot"></div>
+          <div class="field-col"><label>Raio de Canto</label><input type="number" id="inp-radius"></div>
+        </div>
+        <button id="btn-convert-curves" class="btn-secondary" style="margin-top:4px; justify-center;"><i class="fa-solid fa-bezier-curve"></i> Converter em Curvas</button>
+      </div>
+
+      <div class="inspector-sec">
+        <span class="sec-label">Preenchimento</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="color" id="fill-color" style="width:36px; height:36px; border:none; background:transparent; cursor:pointer;">
+          <input type="text" id="fill-hex" value="#3B82F6">
         </div>
       </div>
 
-      <div class="flex flex-col gap-2 border-t border-gray-700 pt-3">
-        <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px]">Contorno / Tracado</span>
-        <div class="flex items-center gap-2">
-          <input type="color" id="stroke-color" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
-          <input type="number" id="stroke-width" class="w-20 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 font-mono" value="2" min="0">
+      <div class="inspector-sec">
+        <span class="sec-label">Contorno / Tracado</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="color" id="stroke-color" style="width:36px; height:36px; border:none; background:transparent; cursor:pointer;">
+          <input type="number" id="stroke-width" value="2" min="0">
         </div>
       </div>
     </aside>
   </div>
 
   <!-- MODAL IMPORT -->
-  <div id="modal-import" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
-    <div class="bg-gray-800 border border-gray-700 rounded-lg p-5 w-96 flex flex-col gap-4 text-xs text-gray-200 shadow-xl">
-      <div class="flex items-center justify-between border-b border-gray-700 pb-2">
-        <h3 class="font-bold text-sm text-white">Importar Formato Vetorial</h3>
-        <button class="btn-close-modal text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+  <div id="modal-import" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>Importar Formato Vetorial</span>
+        <button class="btn-close-modal" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:16px;">&times;</button>
       </div>
-      <p class="text-gray-400">Selecione uma amostra de teste de 1 clique:</p>
-      <div class="grid grid-cols-2 gap-2">
-        <button id="import-sample-ai" class="p-2.5 bg-gray-700 hover:bg-gray-600 rounded border border-gray-600 font-semibold text-blue-400">Amostra .AI</button>
-        <button id="import-sample-cdr" class="p-2.5 bg-gray-700 hover:bg-gray-600 rounded border border-gray-600 font-semibold text-green-400">Amostra .CDR</button>
-        <button id="import-sample-pdf" class="p-2.5 bg-gray-700 hover:bg-gray-600 rounded border border-gray-600 font-semibold text-red-400">Amostra .PDF</button>
-        <button id="import-sample-dxf" class="p-2.5 bg-gray-700 hover:bg-gray-600 rounded border border-gray-600 font-semibold text-purple-400">Amostra .DXF</button>
+      <p style="color:#94a3b8; margin:0;">Selecione uma amostra de teste de 1 clique:</p>
+      <div class="sample-grid">
+        <button id="import-sample-ai" class="sample-btn" style="color:#60a5fa;">Amostra .AI</button>
+        <button id="import-sample-cdr" class="sample-btn" style="color:#4ade80;">Amostra .CDR</button>
+        <button id="import-sample-pdf" class="sample-btn" style="color:#f87171;">Amostra .PDF</button>
+        <button id="import-sample-dxf" class="sample-btn" style="color:#c084fc;">Amostra .DXF</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL EXPORT -->
-  <div id="modal-export" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
-    <div class="bg-gray-800 border border-gray-700 rounded-lg p-5 w-80 flex flex-col gap-4 text-xs text-gray-200 shadow-xl">
-      <div class="flex items-center justify-between border-b border-gray-700 pb-2">
-        <h3 class="font-bold text-sm text-white">Exportar Arte Vetorial</h3>
-        <button class="btn-close-modal text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+  <div id="modal-export" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>Exportar Arte Vetorial</span>
+        <button class="btn-close-modal" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:16px;">&times;</button>
       </div>
-      <div>
-        <label class="block mb-1 text-gray-400">Formato:</label>
-        <select id="export-format" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-gray-200">
+      <div class="field-col">
+        <label>Formato:</label>
+        <select id="export-format">
           <option value="svg">SVG (.svg)</option>
           <option value="eps">EPS (.eps)</option>
           <option value="dxf">DXF (.dxf)</option>
@@ -225,7 +244,7 @@
           <option value="json">JSON (.json)</option>
         </select>
       </div>
-      <button id="btn-do-export" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold">Baixar Arquivo</button>
+      <button id="btn-do-export" class="btn-primary" style="justify-content:center;">Baixar Arquivo</button>
     </div>
   </div>
 
@@ -234,17 +253,11 @@
     const SVG_NS = 'http://' + 'www.w3' + '.org/2000/svg';
 
     const state = {
-      objects: [],
-      selectedIds: [],
-      activeTool: 'select',
-      unit: 'px',
-      dpi: 96,
-      artboard: { width: 800, height: 600 },
+      objects: [], selectedIds: [], activeTool: 'select',
+      unit: 'px', dpi: 96, artboard: { width: 800, height: 600 },
       panX: 100, panY: 50, zoom: 1.0,
-      mode: null, activeHandle: null,
-      dragStart: { x: 0, y: 0 },
-      initialObjStates: {},
-      activePenPath: null, pencilPoints: [], marqueeStart: { x: 0, y: 0 },
+      mode: null, activeHandle: null, dragStart: { x: 0, y: 0 },
+      initialObjStates: {}, activePenPath: null, pencilPoints: [], marqueeStart: { x: 0, y: 0 },
       history: [], historyIndex: -1
     };
 
@@ -707,7 +720,7 @@
         const x = Math.min(pt.x, state.marqueeStart.x), y = Math.min(pt.y, state.marqueeStart.y);
         const w = Math.abs(pt.x - state.marqueeStart.x), h = Math.abs(pt.y - state.marqueeStart.y);
 
-        mGrp.innerHTML = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" stroke-dasharray="3 3"/>`;
+        mGrp.innerHTML = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-dasharray="3 3"/>`;
 
         state.selectedIds = state.objects.filter(o => {
           return o.x < x + w && o.x + o.width > x && o.y < y + h && o.y + o.height > y;
@@ -735,9 +748,9 @@
       state.activeTool = tool;
       document.querySelectorAll('.tool-btn').forEach(btn => {
         if (btn.getAttribute('data-tool') === tool) {
-          btn.classList.add('bg-blue-600', 'text-white');
+          btn.classList.add('active');
         } else {
-          btn.classList.remove('bg-blue-600', 'text-white');
+          btn.classList.remove('active');
         }
       });
       renderGizmos();
@@ -807,15 +820,15 @@
       state.objects.slice().reverse().forEach(obj => {
         const item = document.createElement('div');
         const isSel = state.selectedIds.includes(obj.id);
-        item.className = `p-2 rounded border flex items-center justify-between cursor-pointer ${isSel ? 'bg-blue-900/40 border-blue-500 text-white' : 'bg-gray-700/40 border-gray-700 text-gray-300 hover:bg-gray-700'}`;
+        item.style.cssText = `padding:8px; border-radius:6px; border:1px solid ${isSel ? '#2563eb' : '#334155'}; background:${isSel ? '#1e3a8a' : '#1e293b'}; color:${isSel ? '#ffffff' : '#cbd5e1'}; display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-size:11px;`;
         item.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded" style="background:${obj.fill || '#3b82f6'}"></span>
-            <span class="font-semibold capitalize">${obj.type} (${obj.id})</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="width:10px; height:10px; border-radius:2px; background:${obj.fill || '#2563eb'}; display:inline-block;"></span>
+            <span style="font-weight:600; text-transform:capitalize;">${obj.type} (${obj.id})</span>
           </div>
-          <div class="flex items-center gap-1">
-            <button class="btn-vis px-1 hover:text-white"><i class="fa-solid ${obj.visible ? 'fa-eye' : 'fa-eye-slash text-gray-500'}"></i></button>
-            <button class="btn-del-layer px-1 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+          <div style="display:flex; gap:4px;">
+            <button class="btn-vis" style="background:none; border:none; color:#cbd5e1; cursor:pointer;"><i class="fa-solid ${obj.visible ? 'fa-eye' : 'fa-eye-slash'}"></i></button>
+            <button class="btn-del-layer" style="background:none; border:none; color:#f87171; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
           </div>
         `;
 
@@ -839,12 +852,10 @@
     Object.keys(tabBtns).forEach(key => {
       tabBtns[key].addEventListener('click', () => {
         Object.keys(tabBtns).forEach(k => {
-          tabBtns[k].classList.remove('border-blue-500', 'text-blue-400', 'bg-gray-800');
-          tabBtns[k].classList.add('border-transparent', 'text-gray-400');
+          tabBtns[k].classList.remove('active');
           tabPanels[k].classList.add('hidden');
         });
-        tabBtns[key].classList.add('border-blue-500', 'text-blue-400', 'bg-gray-800');
-        tabBtns[key].classList.remove('border-transparent', 'text-gray-400');
+        tabBtns[key].classList.add('active');
         tabPanels[key].classList.remove('hidden');
       });
     });
@@ -952,6 +963,10 @@
     window.addEventListener('DOMContentLoaded', () => {
       initDefaultObjects(); renderScene(); renderLayers(); updateInspector();
     });
+    // Fallback if DOMContentLoaded already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initDefaultObjects(); renderScene(); renderLayers(); updateInspector();
+    }
   </script>
 </body>
 </html>
